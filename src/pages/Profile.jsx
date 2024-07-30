@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '../config/firebase';
-
+import { db } from '../config/firebase';
 import { getDocs, collection, query, where, orderBy } from 'firebase/firestore';
 import { Blog } from '../Components/Blog';
 
+import { useUser } from '../contexts/UserContext';
+
 export const Profile = () => {
-	const [user] = useAuthState(auth);
+	const userData = useUser();
 
 	const [userBlogs, setUserBlogs] = useState([]);
 
 	const blogsRef = collection(db, 'blogs');
 	const userBlogsQuerry = query(
 		blogsRef,
-		where('userId', '==', user.uid),
+		where('userId', '==', userData.id),
 		orderBy('time')
 	);
 	useEffect(() => {
@@ -24,7 +24,7 @@ export const Profile = () => {
 		});
 	}, []);
 
-	if (!user) {
+	if (!userData) {
 		return <Navigate to="/" replace />;
 	}
 
@@ -32,9 +32,9 @@ export const Profile = () => {
 		<div>
 			<h1>Profile page</h1>
 			<div>
-				<img alt="pfp" src={user.photoURL} />
-				<h2>Name: {user.displayName}</h2>
-				<h2>Email: {user.email}</h2>
+				<img alt="pfp" src={userData.photoURL} />
+				<h2>Name: {userData.name}</h2>
+				<h2>Email: {userData.email}</h2>
 			</div>
 			<hr></hr>
 			<h2>Your blogs</h2>

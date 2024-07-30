@@ -9,12 +9,13 @@ import { Navbar } from './Components/Navbar';
 
 import { auth } from './config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { UserProvider } from './contexts/UserContext';
 
 function App() {
 	const [user] = useAuthState(auth);
 
 	return (
-		<div className="App">
+		<UserProvider>
 			<BrowserRouter>
 				{user && <Navbar />}
 				<Routes>
@@ -24,7 +25,7 @@ function App() {
 					<Route path="*" element={<Navigate to="/auth" replace />} />
 				</Routes>
 			</BrowserRouter>
-		</div>
+		</UserProvider>
 	);
 }
 

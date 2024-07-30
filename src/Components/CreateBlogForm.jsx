@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import { db, auth } from '../config/firebase';
+import { db } from '../config/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useUser } from '../contexts/UserContext';
 
 export const CreateBlogForm = ({ setBlogs }) => {
 	const [title, setTitle] = useState('');
 	const [desc, setDesc] = useState('');
 
-	const [user] = useAuthState(auth);
+	const userData = useUser();
 
 	const blogsRef = collection(db, 'blogs');
 	const handleSubmit = (e) => {
@@ -17,8 +17,8 @@ export const CreateBlogForm = ({ setBlogs }) => {
 		const newBlog = {
 			title: title,
 			description: desc,
-			writer: user.displayName,
-			userId: user.uid,
+			writer: userData.name,
+			userId: userData.id,
 			time: serverTimestamp(),
 		};
 		addDoc(blogsRef, newBlog).then(() => {

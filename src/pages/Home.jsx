@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import { auth, db } from '../config/firebase';
+import { db } from '../config/firebase';
 
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 import { CreateBlogForm } from '../Components/CreateBlogForm';
 import { Blog } from '../Components/Blog';
+import { useUser } from '../contexts/UserContext';
 
 export const Home = () => {
-	const [user] = useAuthState(auth);
+	const userData = useUser();
 
 	const [blogs, setBlogs] = useState([]);
 	const blogsRef = collection(db, 'blogs');
@@ -26,8 +26,7 @@ export const Home = () => {
 			);
 		});
 	}, []);
-
-	if (!user) {
+	if (!userData) {
 		return <Navigate to="/" replace />;
 	}
 
@@ -40,7 +39,7 @@ export const Home = () => {
 					alignItems: 'center',
 				}}
 			>
-				<h1>Home page of {user.displayName}</h1>
+				<h1>Home page of {userData.name}</h1>
 			</div>
 			<div>
 				<h2>create a new Blog</h2>

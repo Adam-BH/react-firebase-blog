@@ -2,8 +2,9 @@ import { signInWithPopup } from 'firebase/auth';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import { auth, provider, db } from '../config/firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { addDoc, collection } from 'firebase/firestore';
+
+import { useUser } from '../contexts/UserContext';
 
 export const Authentification = () => {
 	const navigate = useNavigate();
@@ -27,8 +28,8 @@ export const Authentification = () => {
 		});
 	};
 
-	const [user] = useAuthState(auth);
-	if (user) {
+	const userData = useUser();
+	if (userData) {
 		return <Navigate to="/home" />;
 	}
 
