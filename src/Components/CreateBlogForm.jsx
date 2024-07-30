@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import { db, auth } from '../config/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-export const CreateBlogForm = () => {
+export const CreateBlogForm = ({ setBlogs }) => {
 	const [title, setTitle] = useState('');
 	const [desc, setDesc] = useState('');
 
@@ -14,14 +14,21 @@ export const CreateBlogForm = () => {
 	const blogsRef = collection(db, 'blogs');
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		addDoc(blogsRef, {
+		const newBlog = {
 			title: title,
 			description: desc,
+			writer: user.displayName,
 			userId: user.uid,
-		}).then(() => {
+			time: serverTimestamp(),
+		};
+		addDoc(blogsRef, newBlog).then(() => {
 			setTitle('');
 			setDesc('');
 			e.target.reset();
+
+			setBlogs((prev) => {
+				return [...prev, newBlog];
+			});
 		});
 	};
 

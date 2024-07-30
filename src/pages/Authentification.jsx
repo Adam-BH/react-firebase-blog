@@ -1,13 +1,28 @@
 import { signInWithPopup } from 'firebase/auth';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import { auth, provider } from '../config/firebase';
+import { auth, provider, db } from '../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { addDoc, collection } from 'firebase/firestore';
 
 export const Authentification = () => {
 	const navigate = useNavigate();
+
+	const usersRef = collection(db, 'users');
 	const signIn = () => {
-		signInWithPopup(auth, provider).then(() => {
+		signInWithPopup(auth, provider).then((userCredentials) => {
+			if (
+				userCredentials.user.reloadUserInfo.createdAt ===
+				userCredentials.user.reloadUserInfo.lastLoginAt
+			) {
+				addDoc(usersRef, {
+					userId: userCredentials.user.uid,
+					userRole: 'user',
+				}).then(() => {
+					console.log('doc added');
+				});
+			}
+
 			navigate('/home');
 		});
 	};
