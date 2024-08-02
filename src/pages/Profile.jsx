@@ -20,7 +20,11 @@ export const Profile = () => {
 	);
 	useEffect(() => {
 		getDocs(userBlogsQuerry).then((data) => {
-			setUserBlogs(data.docs.map((doc) => doc.data()));
+			setUserBlogs(
+				data.docs.map((doc) => {
+					return { ...doc.data(), id: doc.id };
+				})
+			);
 		});
 	}, []);
 

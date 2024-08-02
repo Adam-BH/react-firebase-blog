@@ -1,11 +1,22 @@
 import { db } from '../config/firebase';
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import {
+	addDoc,
+	collection,
+	doc,
+	deleteDoc,
+	getDocs,
+	query,
+	where,
+	getDoc,
+} from 'firebase/firestore';
 
 import { useUser } from '../contexts/UserContext';
 import { useEffect, useState } from 'react';
 
 export const Blog = (props) => {
 	const userData = useUser();
+
+	const [idToDelete, setIdToDelete] = useState(null);
 
 	const [likesNumber, setLikesNumber] = useState();
 	const [alreadyLiked, setAlreadyLiked] = useState(false);
@@ -29,6 +40,7 @@ export const Blog = (props) => {
 				setAlreadyLiked(false);
 			} else if (data.docs.length === 1) {
 				setAlreadyLiked(true);
+				setIdToDelete(data.docs[0].id);
 			}
 		});
 	}, []);
@@ -38,12 +50,17 @@ export const Blog = (props) => {
 			addDoc(likesRef, {
 				blogId: props.blog.id,
 				userId: userData.id,
-			}).then(() => {
+			}).then((doc) => {
 				setLikesNumber(likesNumber + 1);
 				setAlreadyLiked(true);
+				setIdToDelete(doc.id);
 			});
 		} else {
-			alert('you already liked this');
+			const likeDocument = doc(db, 'likes', idToDelete);
+			deleteDoc(likeDocument).then(() => {
+				setLikesNumber(likesNumber - 1);
+				setAlreadyLiked(false);
+			});
 		}
 	};
 
